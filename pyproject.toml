@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "Learn_Japanese_Gojūon"
+version = "0.9.0"
+description = ""
+authors = ["Nya-WSL"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.11.5"
+nicegui = "^2.9.0"
+pyinstaller = "^6.11.1"
+pywebview = "^5.3.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
