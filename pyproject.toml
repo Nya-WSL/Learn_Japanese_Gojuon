@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "Learn_Japanese_Gojūon"
-version = "0.9.0"
+version = "0.10.0"
 description = ""
 authors = ["Nya-WSL"]
 readme = "README.md"

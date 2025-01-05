@@ -2,10 +2,11 @@ import json
 import random
 from nicegui import ui, native, app
 
-version = "0.9.0"
+version = "0.10.0"
 hira_path = "data/hira_dict.json"
 kata_path = "data/kata_dict.json"
 app.add_static_files('/static', 'static')
+port = native.find_open_port(65000, 65525)
 
 def check_hira(id):
     with open(hira_path, "r", encoding="utf-8") as f:
@@ -48,6 +49,17 @@ with open(kata_path, "w+", encoding="utf-8") as f:
 # Main Page #
 @ui.page("/")
 def index():
+    ui.add_head_html(r'''
+<style>
+@font-face{
+    font-family: "ResourceHanRounded";
+    src: url('/static/RESOURCEHANROUNDEDJ-MEDIUM.TTF') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+</style>
+''')
+
     def start():
         with open(hira_path, "r", encoding="utf-8") as f:
             hira_data = json.load(f)
@@ -71,7 +83,7 @@ def index():
         hira_data = json.load(f)
     with open(kata_path, "r", encoding="utf-8") as f:
         kata_data = json.load(f)
-    with ui.row():
+    with ui.row().style('font-family: "ResourceHanRounded"; font-weight: bold;'):
         with ui.card(align_items="center"):
             with ui.row():
                 with ui.column():
@@ -129,11 +141,24 @@ def index():
                     bya_kata = ui.checkbox("拗音びゃ行 カタカナ", value=kata_data["bya_kata"]["status"], on_change=lambda: check_kata("bya_kata"))
                     tsuika_kata = ui.checkbox("カタカナ追加", value=kata_data["tsuika_kata"]["status"], on_change=lambda: check_kata("tsuika_kata"))
 
-        ui.button("开始", on_click=lambda: start())
+        with ui.column():
+            ui.button("开始", on_click=lambda: start())
+            ui.button("网页", on_click=lambda: ui.navigate.to(f"http://localhost:{port}", True))
 
 # Roman Page #
 @ui.page("/roman")
 def index():
+    ui.add_head_html(r'''
+<style>
+@font-face{
+    font-family: "ResourceHanRounded";
+    src: url('/static/RESOURCEHANROUNDEDJ-MEDIUM.TTF') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+</style>
+''')
+
     def hira_choice():
         with open(hira_path, "r", encoding="utf-8") as f:
             hira_data = json.load(f)
@@ -185,7 +210,7 @@ def index():
         else:
             ui.notify("罗马音错误，请重新输入", type="negative")
 
-    with ui.card(align_items="center").classes("absolute-center w-2/3"):
+    with ui.card(align_items="center").classes("absolute-center w-2/3").style('font-family: "ResourceHanRounded";'):
 
         kana = choice()
         for key, value in kana.items():
@@ -201,4 +226,4 @@ def index():
             ui.button("返回", on_click=lambda: ui.navigate.to("/"))
             ui.button("答案", on_click=lambda: ui.notify(f"罗马音：{kana_value}"))
 
-ui.run(title=f"Learn Japanese Gojūon | v{version}", favicon="static/logo.png", port=native.find_open_port(65000, 65525), language="zh-CN", show=False, native=True, reload=False, window_size=[900, 800])
+ui.run(title=f"Learn Japanese Gojūon | v{version}", favicon="static/logo.png", port=port, show=False, native=True, reload=False, window_size=[900, 800])
