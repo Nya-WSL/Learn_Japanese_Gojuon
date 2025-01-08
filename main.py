@@ -2,11 +2,18 @@ import json
 import random
 from nicegui import ui, native, app
 
-version = "0.10.0"
+version = "0.11.0"
 hira_path = "data/hira_dict.json"
 kata_path = "data/kata_dict.json"
 app.add_static_files('/static', 'static')
 port = native.find_open_port(65000, 65525)
+app.storage.general.indent = True
+
+### Init Count Dict ###
+if "true_count" not in app.storage.general or "false_count" not in app.storage.general or "cue_count" not in app.storage.general:
+    app.storage.general["true_count"] = 0
+    app.storage.general["false_count"] = 0
+    app.storage.general["cue_count"] = 0
 
 def check_hira(id):
     with open(hira_path, "r", encoding="utf-8") as f:
@@ -27,6 +34,13 @@ def check_kata(id):
         data[id]["status"] = True
     with open(kata_path, "w+", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
+
+### Count Function ###
+def count(status):
+    if status == True:
+        app.storage.general["true_count"] += 1
+    elif status == False:
+        app.storage.general["false_count"] += 1
 
 ### Init Dict ###
 with open(hira_path, "r", encoding="utf-8") as f:
@@ -58,9 +72,15 @@ def index():
     font-style: normal;
 }
 </style>
-''')
+''') # Custom Fonts
 
     def start():
+        ### Reset Count Dict###
+        app.storage.general["true_count"] = 0
+        app.storage.general["false_count"] = 0
+        app.storage.general["cue_count"] = 0
+
+        ### Init Roman Dict ###
         with open(hira_path, "r", encoding="utf-8") as f:
             hira_data = json.load(f)
         with open(kata_path, "r", encoding="utf-8") as f:
@@ -74,6 +94,7 @@ def index():
             if kata_data[id]["status"] == True:
                 bool_kata.append(id)
 
+        ### Error Report ###
         if bool_hira == [] and bool_kata == []:
             ui.notify("请选择行", position="center", type="negative")
         else:
@@ -142,8 +163,21 @@ def index():
                     tsuika_kata = ui.checkbox("カタカナ追加", value=kata_data["tsuika_kata"]["status"], on_change=lambda: check_kata("tsuika_kata"))
 
         with ui.column():
-            ui.button("开始", on_click=lambda: start())
-            ui.button("网页", on_click=lambda: ui.navigate.to(f"http://localhost:{port}", True))
+            with ui.card():
+                ui.button("开始", on_click=lambda: start())
+                ui.button("网页", on_click=lambda: ui.navigate.to(f"http://localhost:{port}", True))
+                ui.button("关于", on_click=lambda: ui.navigate.to("https://github.com/Nya-WSL/Learn_Japanese_Gojuon", True))
+            with ui.card():
+                ui.label("上次练习")
+                with ui.row():
+                    ui.label("正确")
+                    ui.badge(app.storage.general["true_count"], color="green")
+                with ui.row():
+                    ui.label("错误")
+                    ui.badge(app.storage.general["false_count"], color="red")
+                with ui.row():
+                    ui.label("提示")
+                    ui.badge(app.storage.general["cue_count"], color="blue")
 
 # Roman Page #
 @ui.page("/roman")
@@ -157,7 +191,7 @@ def index():
     font-style: normal;
 }
 </style>
-''')
+''') # Custom Fonts
 
     def hira_choice():
         with open(hira_path, "r", encoding="utf-8") as f:
@@ -206,9 +240,15 @@ def index():
 
     def check_roman():
         if f"{roman.value}" in kana_value:
+            count(True)
             ui.navigate.to("/roman")
         else:
+            count(False)
             ui.notify("罗马音错误，请重新输入", type="negative")
+
+    def cue():
+        app.storage.general["cue_count"] += 1
+        ui.notify(f"罗马音：{kana_value}")
 
     with ui.card(align_items="center").classes("absolute-center w-2/3").style('font-family: "ResourceHanRounded";'):
 
@@ -224,6 +264,6 @@ def index():
         with ui.row():
             ui.button("确认", on_click=lambda: check_roman())
             ui.button("返回", on_click=lambda: ui.navigate.to("/"))
-            ui.button("答案", on_click=lambda: ui.notify(f"罗马音：{kana_value}"))
+            ui.button("答案", on_click=lambda: cue())
 
-ui.run(title=f"Learn Japanese Gojūon | v{version}", favicon="static/logo.png", port=port, show=False, native=True, reload=False, window_size=[900, 800])
+ui.run(title=f"Learn Japanese Gojūon | v{version}", favicon="static/logo.png", port=port, show=False, native=True, reload=False, window_size=[930, 800])
