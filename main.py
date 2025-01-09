@@ -266,4 +266,4 @@ def index():
             ui.button("返回", on_click=lambda: ui.navigate.to("/"))
             ui.button("答案", on_click=lambda: cue())
 
-ui.run(title=f"Learn Japanese Gojūon | v{version}", favicon="static/logo.png", port=port, show=False, native=True, reload=False, window_size=[930, 800])
+ui.run(title=f"Learn Japanese Gojūon | v{version} | Nya-WSL", favicon="static/logo.png", port=port, show=False, native=True, reload=False, window_size=[930, 800])
