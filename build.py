@@ -68,6 +68,8 @@ def main() -> None:
         return
 
     subprocess.call(command)
+    shutil.copytree("static", os.path.join("dist", "Learn_Japanese_Gojūon", "static"))
+    shutil.copytree("data", os.path.join("dist", "Learn_Japanese_Gojūon", "data"))
 
 
 if __name__ == '__main__':
