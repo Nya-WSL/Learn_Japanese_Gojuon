@@ -1,6 +1,6 @@
 # Learn Japanese Gojūon
 
-![python](https://img.shields.io/badge/Version-0.11.0-cyan) ![python](https://img.shields.io/badge/Python-3.11.5-blue) ![NiceGUI](https://img.shields.io/badge/NiceGUI-2.9.0-blue) ![os](https://img.shields.io/badge/OS-Windows-orange)
+![python](https://img.shields.io/badge/Version-1.0.0-cyan) ![python](https://img.shields.io/badge/Python-3.11.5-blue) ![NiceGUI](https://img.shields.io/badge/NiceGUI-2.9.0-blue) ![os](https://img.shields.io/badge/OS-Windows-orange)
 
 ### Build
 

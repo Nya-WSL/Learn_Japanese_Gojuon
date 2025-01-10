@@ -1,8 +1,9 @@
 import json
 import random
+import requests
 from nicegui import ui, native, app
 
-version = "0.11.0"
+version = "1.0.0"
 hira_path = "data/hira_dict.json"
 kata_path = "data/kata_dict.json"
 app.add_static_files('/static', 'static')
@@ -14,6 +15,20 @@ if "true_count" not in app.storage.general or "false_count" not in app.storage.g
     app.storage.general["true_count"] = 0
     app.storage.general["false_count"] = 0
     app.storage.general["cue_count"] = 0
+
+def check_update(status):
+    url = "https://github.com/Nya-WSL/Learn_Japanese_Gojuon/releases/download/version/version"
+    server = requests.get(url).text
+
+    if app.storage.general["version_check"] == True or status == True:
+        if server != version:
+            with ui.dialog() as dialog, ui.card():
+                ui.label(f"New version v{server} available!")
+                ui.button('更新', on_click=lambda: ui.navigate.to("https://github.com/Nya-WSL/Learn_Japanese_Gojuon/releases", new_tab=True)).classes("w-full")
+                ui.button('取消', on_click=dialog.close).classes("w-full")
+            dialog.open()
+        else:
+            ui.notify("No update available!", type="positive")
 
 def check_hira(id):
     with open(hira_path, "r", encoding="utf-8") as f:
@@ -42,7 +57,9 @@ def count(status):
     elif status == False:
         app.storage.general["false_count"] += 1
 
-### Init Dict ###
+### Init ###
+app.storage.general["version_check"] = True
+
 with open(hira_path, "r", encoding="utf-8") as f:
     hira_data = json.load(f)
 with open(kata_path, "r", encoding="utf-8") as f:
@@ -99,6 +116,8 @@ def index():
             ui.notify("请选择行", position="center", type="negative")
         else:
             ui.navigate.to("/roman")
+
+    check_update(True)
 
     with open(hira_path, "r", encoding="utf-8") as f:
         hira_data = json.load(f)
@@ -167,6 +186,7 @@ def index():
                 ui.button("开始", on_click=lambda: start())
                 ui.button("网页", on_click=lambda: ui.navigate.to(f"http://localhost:{port}", True))
                 ui.button("关于", on_click=lambda: ui.navigate.to("https://github.com/Nya-WSL/Learn_Japanese_Gojuon", True))
+                ui.button("更新", on_click=lambda: check_update(True))
             with ui.card():
                 ui.label("上次练习")
                 with ui.row():
@@ -250,6 +270,10 @@ def index():
         app.storage.general["cue_count"] += 1
         ui.notify(f"罗马音：{kana_value}")
 
+    def return_home():
+        app.storage.general["version_check"] = False
+        ui.navigate.to("/")
+
     with ui.card(align_items="center").classes("absolute-center w-2/3").style('font-family: "ResourceHanRounded";'):
 
         kana = choice()
@@ -263,7 +287,7 @@ def index():
         roman = ui.input(label="罗马音").classes("w-full")
         with ui.row():
             ui.button("确认", on_click=lambda: check_roman())
-            ui.button("返回", on_click=lambda: ui.navigate.to("/"))
+            ui.button("返回", on_click=lambda: return_home())
             ui.button("答案", on_click=lambda: cue())
 
-ui.run(title=f"Learn Japanese Gojūon | v{version} | Nya-WSL", favicon="static/logo.png", port=port, show=False, native=True, reload=False, window_size=[930, 800])
+ui.run(title=f"Learn Japanese Gojūon | Nya-WSL | v{version}", favicon="static/logo.png", port=port, show=False, native=True, reload=False, window_size=[930, 800])
