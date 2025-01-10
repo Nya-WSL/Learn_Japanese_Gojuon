@@ -1,11 +1,12 @@
+import os
 import json
 import random
 import requests
 from nicegui import ui, native, app
 
-version = "1.0.0"
-hira_path = "data/hira_dict.json"
-kata_path = "data/kata_dict.json"
+version = "1.0.1"
+hira_path = os.path.join("data", "hira_dict.json")
+kata_path = os.path.join("data", "kata_dict.json")
 app.add_static_files('/static', 'static')
 port = native.find_open_port(65000, 65525)
 app.storage.general.indent = True
@@ -117,7 +118,7 @@ def index():
         else:
             ui.navigate.to("/roman")
 
-    check_update(True)
+    check_update(False)
 
     with open(hira_path, "r", encoding="utf-8") as f:
         hira_data = json.load(f)
